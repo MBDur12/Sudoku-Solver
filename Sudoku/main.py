@@ -34,7 +34,8 @@ class Grid:
         self.height = height - (height - width)
         self.board = board
 
-        self.cells = [Cell(i, j, self.width, self.height, self.board[i][j]) for j in range(cols) for i in range(rows)]
+        self.cells = [[Cell(i, j, self.width, self.height, self.board[i][j]) for j in range(cols)] for i in range(rows)]
+        
     def draw_grid(self):
         interval = self.width / self.rows
 
@@ -49,8 +50,9 @@ class Grid:
             pygame.draw.line(win, BLACK, (i * interval, 0), (i * interval, self.height), thickness)
 
             # draw in cell number (if non-zero)
-            for cell in self.cells:
-                cell.draw()
+            for i in range(self.rows):
+                for j in range(self.cols):
+                    self.cells[i][j].draw()
 
 class Cell:
     def __init__(self, row, col, width, height, value):
@@ -71,8 +73,8 @@ class Cell:
         cell_space = font.render(str(self.value), True, BLACK)
         # define position of number (with offset)
         interval = self.width / 9
-        x_pos = (self.row * interval) + 20
-        y_pos = (self.col * interval) + 10
+        x_pos = (self.col * interval) + 20
+        y_pos = (self.row * interval) + 10
 
         win.blit(cell_space, (x_pos, y_pos))
 
