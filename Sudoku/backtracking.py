@@ -36,4 +36,29 @@ def find_empty(board):
 
     return None
 
-print(find_empty(board))
+
+# checks if a number can be validly placed in a given cell
+def is_valid(board, coords, num):
+    # checks inclusion along target row (x coord)
+    if num in board[coords[0]]:
+        return False
+    # checks if value is already in target column
+    for i in range(len(board)):
+        if board[i][coords[1]] == num:
+            return False
+
+    # checks inclusion in 3x3 square
+    square_x = coords[0] // 3
+    square_y = coords[1] // 3
+
+    for i in range(square_x * 3, square_x * 3 + 3):
+        for j in range(square_y * 3, square_y * 3 + 3):
+            if board[i][j] == num:
+                return False
+
+    return True
+
+
+    
+    
+
