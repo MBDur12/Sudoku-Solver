@@ -34,6 +34,7 @@ class Grid:
         self.height = height - (height - width)
         self.board = board
 
+        self.cells = [Cell(i, j, self.width, self.height, self.board[i][j]) for j in range(cols) for i in range(rows)]
     def draw_grid(self):
         interval = self.width / self.rows
 
@@ -47,18 +48,35 @@ class Grid:
             # vertical line
             pygame.draw.line(win, BLACK, (i * interval, 0), (i * interval, self.height), thickness)
 
+            # draw in cell number (if non-zero)
+            for cell in self.cells:
+                cell.draw()
+
 class Cell:
-    def __init__(self, row, col, width, height, value, window):
+    def __init__(self, row, col, width, height, value):
         self.row = row
         self.col = col
         # values determined by the size of the board / 9 for each square
         self.width = width
         self.height = height
         self.value = value
+        self.focused = False
 
     # draws cell based on width/height and position in board array
     def draw(self):
-        pass
+        font = pygame.font.SysFont("arial", 40)
+        if (self.value == 0):
+            return 
+        # create "image" of non-zero values in the board
+        cell_space = font.render(str(self.value), True, BLACK)
+        # define position of number (with offset)
+        interval = self.width / 9
+        x_pos = (self.row * interval) + 20
+        y_pos = (self.col * interval) + 10
+
+        win.blit(cell_space, (x_pos, y_pos))
+
+
 
 
 def main():
