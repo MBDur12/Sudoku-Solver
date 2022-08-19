@@ -27,13 +27,13 @@ def print_board(board):
             else:
                 print(str(board[i][j]) + " ", end="")
             
+# finds first empty square in board and returns tuple (x, y)
+def find_empty(board):
+    for i in range(len(board)):
+        for j in range(len(board[i])):
+            if board[i][j] == 0:
+                return (i , j)
 
-            
+    return None
 
-
-print_board(board)
-
-        # loop through each col in the row
-
-           
-            # then print the number and another vetical line
+print(find_empty(board))
