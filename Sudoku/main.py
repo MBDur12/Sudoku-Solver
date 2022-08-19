@@ -43,9 +43,9 @@ class Grid:
             else:
                 thickness = 1
 
-            pygame.draw.line(win, BLACK, (0, i * interval), (self.width, i * interval))
+            pygame.draw.line(win, BLACK, (0, i * interval), (self.width, i * interval), thickness)
             # vertical line
-            pygame.draw.line(win, BLACK, (i * interval, 0), (i * interval, self.height))
+            pygame.draw.line(win, BLACK, (i * interval, 0), (i * interval, self.height), thickness)
 
 class Cell:
     def __init__(self, row, col, width, height, value, window):
