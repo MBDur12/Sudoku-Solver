@@ -10,6 +10,30 @@ board = [
     [0,4,9,2,0,6,0,0,7]
 ]
 
+# uses backtracking to solve the given board
+def solve_board(board):
+    #  basecase - no empty square found
+    pos = find_empty(board)
+    if pos == None:
+        return True
+    else:
+        row, col = pos
+
+    # iterates across value range
+    for num in range(1, 10):
+        # apply value if it satisfies constraints
+        if  is_valid(board, (row, col), num):
+            board[row][col] = num
+            # recurse on that (currently) valid decision
+            if solve_board(board):
+                return True
+            # otherwise, backtrack from that decision
+            board[row][col] = 0
+        
+    return False
+
+    
+
 
 # prints out current state of the board
 def print_board(board):
@@ -59,6 +83,4 @@ def is_valid(board, coords, num):
     return True
 
 
-    
-    
 
