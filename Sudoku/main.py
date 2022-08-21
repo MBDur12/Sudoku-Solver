@@ -23,8 +23,9 @@ board = [
     [1, 2, 0, 0, 0, 7, 4, 0, 0],
     [0, 4, 9, 2, 0, 6, 0, 0, 7]
 ]
-
-
+def get_row_col(position):
+    row, col = int(position[1] / 60), int(position[0] / 60)
+    return (row, col)
 class Grid:
 
     def __init__(self, rows, cols, width, height, board):
@@ -53,6 +54,10 @@ class Grid:
             for i in range(self.rows):
                 for j in range(self.cols):
                     self.cells[i][j].draw()
+
+    def handleClick(self, mouse_pos):
+        row, col = get_row_col(mouse_pos)
+        print(row, col)
 
 class Cell:
     def __init__(self, row, col, width, height, value):
@@ -91,6 +96,9 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
                 pygame.quit()
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                grid.handleClick(pygame.mouse.get_pos())
 
         pygame.display.update()
 
