@@ -1,3 +1,5 @@
+from pickle import TRUE
+from tkinter.tix import CELL
 import pygame
 
 pygame.init()
@@ -7,6 +9,7 @@ pygame.init()
 WIDTH, HEIGHT = 540, 600
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+RED = (255, 0, 0)
 
 win = pygame.display.set_mode((WIDTH, HEIGHT))
 win.fill((WHITE))
@@ -56,8 +59,9 @@ class Grid:
                     self.cells[i][j].draw()
 
     def handleClick(self, mouse_pos):
+        # translates mouse position to corresponding cell indices
         row, col = get_row_col(mouse_pos)
-        print(row, col)
+        self.cells[row][col].set_focus()
 
 class Cell:
     def __init__(self, row, col, width, height, value):
@@ -69,17 +73,24 @@ class Cell:
         self.value = value
         self.focused = False
 
+    def set_focus(self):
+        self.focused = True
     # draws cell based on width/height and position in board array
     def draw(self):
         font = pygame.font.SysFont("arial", 40)
         if (self.value == 0):
-            return 
-        # create "image" of non-zero values in the board
-        cell_space = font.render(str(self.value), True, BLACK)
+            cell_space = font.render("", True, BLACK)
+        else:
+            # create "image" of non-zero values in the board
+            cell_space = font.render(str(self.value), True, BLACK)
         # define position of number (with offset)
         interval = self.width / 9
         x_pos = (self.col * interval) + 20
         y_pos = (self.row * interval) + 10
+
+        if self.focused:
+            highlighted_sq = pygame.Rect(self.col*60, self.row*60, 60, 60)
+            pygame.draw.rect(win, RED, highlighted_sq, 2)
 
         win.blit(cell_space, (x_pos, y_pos))
 
