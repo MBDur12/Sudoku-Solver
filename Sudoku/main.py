@@ -39,7 +39,7 @@ class Grid:
         self.cells = [[Cell(i, j, self.width, self.height, self.board[i][j]) for j in range(cols)] for i in range(rows)]
         self.focused_cell = None
 
-    def get_coords_from_mouse_position(position):
+    def get_coords_from_mouse_position(self, position):
         row, col = int(position[1] / 60), int(position[0] / 60)
         return (row, col)
 
@@ -60,6 +60,11 @@ class Grid:
             for i in range(self.rows):
                 for j in range(self.cols):
                     self.cells[i][j].draw()
+    # returns true if click occurs within the grid
+    def is_valid_position(self, mouse_pos):
+        if mouse_pos[0] < self.width and mouse_pos[1] < self.height:
+            return True
+        return False
 
     def handleClick(self, mouse_pos):
         # translates mouse position to corresponding cell indices
@@ -118,9 +123,6 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
                 pygame.quit()
-
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                grid.handleClick(pygame.mouse.get_pos())
             
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_1:
@@ -141,6 +143,18 @@ def main():
                     key = 8
                 if event.key == pygame.K_9:
                     key = 9
+            
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                position = pygame.mouse.get_pos()
+                if grid.is_valid_position(position):
+                    key = None
+                    grid.handleClick(position)
+        
+        # 
+            
+        
+        
+            
 
         redraw_window(win, grid)
         pygame.display.update()
