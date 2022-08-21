@@ -109,7 +109,7 @@ class Cell:
             font = pygame.font.SysFont("arial", 15)
             cell_value = font.render(str(self.temp_value), True, GREY)
             win.blit(cell_value, (x_pos, y_pos))
-        elif self.temp_value == 0 and self.value != 0: 
+        elif self.value != 0: 
             font = pygame.font.SysFont("arial", 40) 
             cell_value = font.render(str(self.value), True, BLACK,)
             win.blit(cell_value, (x_pos, y_pos))
