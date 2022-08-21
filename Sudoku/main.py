@@ -10,6 +10,7 @@ WIDTH, HEIGHT = 540, 600
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
+GREY = (128, 128, 128)
 
 win = pygame.display.set_mode((WIDTH, HEIGHT))
 win.fill((WHITE))
@@ -60,7 +61,7 @@ class Grid:
             for i in range(self.rows):
                 for j in range(self.cols):
                     self.cells[i][j].draw()
-    # returns true if click occurs within the grid
+    # returns true if mouse position on click occurs within the grid
     def is_valid_position(self, mouse_pos):
         if mouse_pos[0] < self.width and mouse_pos[1] < self.height:
             return True
@@ -75,6 +76,9 @@ class Grid:
         self.focused_cell = self.cells[row][col]
         self.focused_cell.set_focus()
 
+    def draw_note(self, key_val):
+        self.focused_cell.set_temp_value(key_val)
+
 class Cell:
     def __init__(self, row, col, width, height, value):
         self.row = row
@@ -83,30 +87,39 @@ class Cell:
         self.width = width
         self.height = height
         self.value = value
+        self.temp_value = 0
         self.focused = False
 
     def remove_focus(self):
         self.focused = False
     def set_focus(self):
         self.focused = True
+
+    def set_temp_value(self, val):
+        self.temp_value = val
     # draws cell based on width/height and position in board array
     def draw(self):
-        font = pygame.font.SysFont("arial", 40)
-        if (self.value == 0):
-            cell_space = font.render("", True, BLACK)
-        else:
-            # create "image" of non-zero values in the board
-            cell_space = font.render(str(self.value), True, BLACK)
         # define position of number (with offset)
         interval = self.width / 9
         x_pos = (self.col * interval) + 20
         y_pos = (self.row * interval) + 10
 
+        # TODO: remove duplication: what idea are you trying to capture?
+        if self.temp_value != 0 and self.value == 0:
+            font = pygame.font.SysFont("arial", 15)
+            cell_value = font.render(str(self.temp_value), True, GREY)
+            win.blit(cell_value, (x_pos, y_pos))
+        elif self.temp_value == 0 and self.value != 0: 
+            font = pygame.font.SysFont("arial", 40) 
+            cell_value = font.render(str(self.value), True, BLACK,)
+            win.blit(cell_value, (x_pos, y_pos))
+            
+        
         if self.focused:
             highlighted_sq = pygame.Rect(self.col*60, self.row*60, 60, 60)
             pygame.draw.rect(win, RED, highlighted_sq, 2)
 
-        win.blit(cell_space, (x_pos, y_pos))
+        
 
 
 
@@ -150,7 +163,9 @@ def main():
                     key = None
                     grid.handleClick(position)
         
-        # 
+        # Note down temporary value for focused cell
+        if grid.focused_cell and key != None:
+            grid.draw_note(key)
             
         
         
