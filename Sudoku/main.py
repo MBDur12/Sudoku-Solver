@@ -39,7 +39,7 @@ class Grid:
         self.board = board
 
         self.cells = [[Cell(i, j, self.width, self.height, self.board[i][j]) for j in range(cols)] for i in range(rows)]
-        
+        self.focused_cell = None
     def draw_grid(self):
         interval = self.width / self.rows
 
@@ -61,7 +61,11 @@ class Grid:
     def handleClick(self, mouse_pos):
         # translates mouse position to corresponding cell indices
         row, col = get_row_col(mouse_pos)
-        self.cells[row][col].set_focus()
+        if self.focused_cell:
+            self.focused_cell.remove_focus()
+
+        self.focused_cell = self.cells[row][col]
+        self.focused_cell.set_focus()
 
 class Cell:
     def __init__(self, row, col, width, height, value):
@@ -73,6 +77,8 @@ class Cell:
         self.value = value
         self.focused = False
 
+    def remove_focus(self):
+        self.focused = False
     def set_focus(self):
         self.focused = True
     # draws cell based on width/height and position in board array
@@ -96,12 +102,14 @@ class Cell:
 
 
 
+def redraw_window(win, grid):
+    win.fill(WHITE)
+    grid.draw_grid()
 
 def main():
     grid = Grid(9, 9, WIDTH, HEIGHT, board)
     run = True
     while run:
-        grid.draw_grid()
         for event in pygame.event.get():
             # exit on quit
             if event.type == pygame.QUIT:
@@ -111,6 +119,7 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 grid.handleClick(pygame.mouse.get_pos())
 
+        redraw_window(win, grid)
         pygame.display.update()
 
 
