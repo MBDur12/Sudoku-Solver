@@ -81,6 +81,7 @@ class Grid:
     def draw_note(self, key_val):
         self.focused_cell.set_temp_value(key_val)
 
+    
     def place_num(self):
         row = self.focused_cell.row
         col = self.focused_cell.col
@@ -101,7 +102,8 @@ class Cell:
     def __init__(self, row, col, width, height, value):
         self.row = row
         self.col = col
-        # values determined by the size of the board / 9 for each square
+        # initial cell values on board creation should not be edited
+        self.editable = False if value > 0 else True
         self.width = width
         self.height = height
         self.value = value
@@ -181,9 +183,13 @@ def main():
                 if event.key == pygame.K_RETURN:
                     if grid.focused_cell:
                         if grid.place_num():
-                            pass
+                            print("success")
                         else:
                             key == None
+
+                if event.key == pygame.K_CLEAR:
+                    print("clear")
+                    grid.reset()
                         
 
 
