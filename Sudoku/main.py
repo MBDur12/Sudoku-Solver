@@ -1,5 +1,5 @@
 import pygame
-from backtracking import is_valid
+from backtracking import is_valid, solve_board
 
 pygame.font.init()
 
@@ -103,17 +103,18 @@ class Grid:
         row = self.focused_cell.row
         col = self.focused_cell.col
         val = self.focused_cell.temp_value
-        if not is_valid(self.board, (row,col), val):         
-            return False
-        
         self.update_board((row, col), val)
-        self.focused_cell.set_value(val)
-        return True
+        if is_valid(self.board, (row,col), val) and solve_board(self.board):
+            self.focused_cell.set_value(val)         
+            return True
+
+        self.update_board((row, col), 0)
+        return False
     
     def is_filled(self):
         for i in range(self.rows):
             for j in range(self.cols):
-                if self.board[i][j] == 0:
+                if self.cells[i][j].value == 0:
                     return False
         return True
         
@@ -256,6 +257,9 @@ def main():
 
                 if event.key == pygame.K_CLEAR or event.key == pygame.K_DELETE:
                     grid.clear_focused_cell()
+
+                if event.key == pygame.K_SPACE:
+                    print(solve_board(grid.board))
                                
 
 
