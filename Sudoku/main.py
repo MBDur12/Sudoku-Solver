@@ -42,6 +42,16 @@ class Grid:
     def update_board(self, pos, val):
         self.board[pos[0]][pos[1]] = val
 
+    def clear_focused_cell(self):
+        if self.focused_cell:
+            self.focused_cell.reset_values()
+            self.update_board(
+                (self.focused_cell.row, self.focused_cell.col)
+                ,0
+                )
+                  
+                    
+
     def get_coords_from_mouse_position(self, position):
         row, col = int(position[1] / 60), int(position[0] / 60)
         return (row, col)
@@ -72,6 +82,7 @@ class Grid:
     def handleClick(self, mouse_pos):
         # translates mouse position to corresponding cell indices
         row, col = self.get_coords_from_mouse_position(mouse_pos)
+        # removes focus from currently focused cell
         if self.focused_cell:
             self.focused_cell.remove_focus()
 
@@ -86,7 +97,7 @@ class Grid:
         row = self.focused_cell.row
         col = self.focused_cell.col
         val = self.focused_cell.temp_value
-        if not is_valid(self.board, (row,col), val):
+        if not is_valid(self.board, (row,col), val):         
             return False
         
         self.update_board((row, col), val)
@@ -115,6 +126,11 @@ class Cell:
     def set_focus(self):
         self.focused = True
 
+    def reset_values(self):
+        self.temp_value = 0
+        self.value = 0
+
+
     def set_temp_value(self, val):
         self.temp_value = val
     def set_value(self, val):
@@ -126,6 +142,7 @@ class Cell:
         interval = self.width / 9
         x_pos = (self.col * interval) + 20
         y_pos = (self.row * interval) + 10
+        
 
         # TODO: remove duplication: what idea are you trying to capture?
         if self.temp_value != 0 and self.value == 0:
@@ -187,10 +204,9 @@ def main():
                         else:
                             key == None
 
-                if event.key == pygame.K_CLEAR:
-                    print("clear")
-                    grid.reset()
-                        
+                if event.key == pygame.K_CLEAR or event.key == pygame.K_DELETE:
+                    grid.clear_focused_cell()
+                               
 
 
                
