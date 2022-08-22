@@ -64,11 +64,12 @@ def find_empty(board):
 # checks if a number can be validly placed in a given cell
 def is_valid(board, coords, num):
     # checks inclusion along target row (x coord)
-    if num in board[coords[0]]:
-        return False
+    for i in range(len(board[coords[0]])):
+        if board[coords[0]][i] == num and i != coords[1]:
+            return False
     # checks if value is already in target column
     for i in range(len(board)):
-        if board[i][coords[1]] == num:
+        if board[i][coords[1]] == num and i != coords[0]:
             return False
 
     # checks inclusion in 3x3 square
@@ -77,7 +78,7 @@ def is_valid(board, coords, num):
 
     for i in range(square_x * 3, square_x * 3 + 3):
         for j in range(square_y * 3, square_y * 3 + 3):
-            if board[i][j] == num:
+            if board[i][j] == num and (i, j) != coords:
                 return False
 
     return True
