@@ -15,6 +15,8 @@ win = pygame.display.set_mode((WIDTH, HEIGHT))
 win.fill((WHITE))
 pygame.display.set_caption("Sudoku Solver")
 
+INCREMENT_TIMER = pygame.USEREVENT + 1
+
 board = [
     [7, 8, 0, 4, 0, 0, 1, 2, 0],
     [6, 0, 0, 0, 7, 5, 0, 0, 9],
@@ -160,18 +162,28 @@ class Cell:
             pygame.draw.rect(win, RED, highlighted_sq, 2)
 
         
+def get_formatted_time(time):
+    mins = time // 60
+    secs = time % 60
+    return f"{mins:02d}:{secs:02d}"
 
 
 
-def draw_window(win, grid):
+def draw_window(win, grid, time):
+    font = pygame.font.SysFont("arial", 30)
+    timer_text = font.render("Time: "+ get_formatted_time(time), True, BLACK)
+
     win.fill(WHITE)
     grid.draw_grid()
+    win.blit(timer_text, (10, HEIGHT - 50))
 
     pygame.display.update()
 
 
 def main():
     grid = Grid(9, 9, WIDTH, HEIGHT, board)
+    pygame.time.set_timer(INCREMENT_TIMER, 1000)
+    time = 0
     run = True
     while run:
         for event in pygame.event.get():
@@ -179,6 +191,9 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
                 pygame.quit()
+
+            if event.type == INCREMENT_TIMER:
+                time += 1
             
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_1:
@@ -228,7 +243,7 @@ def main():
         
             
 
-        draw_window(win, grid)
+        draw_window(win, grid, time)
         
 
 
