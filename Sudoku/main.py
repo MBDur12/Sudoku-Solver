@@ -1,6 +1,5 @@
-from pickle import TRUE
-from tkinter.tix import CELL
 import pygame
+from backtracking import is_valid
 
 pygame.init()
 
@@ -39,6 +38,9 @@ class Grid:
 
         self.cells = [[Cell(i, j, self.width, self.height, self.board[i][j]) for j in range(cols)] for i in range(rows)]
         self.focused_cell = None
+
+    def update_board(self, pos, val):
+        self.board[pos[0]][pos[1]] = val
 
     def get_coords_from_mouse_position(self, position):
         row, col = int(position[1] / 60), int(position[0] / 60)
@@ -79,6 +81,22 @@ class Grid:
     def draw_note(self, key_val):
         self.focused_cell.set_temp_value(key_val)
 
+    def place_num(self):
+        row = self.focused_cell.row
+        col = self.focused_cell.col
+        val = self.focused_cell.temp_value
+        if not is_valid(self.board, (row,col), val):
+            return False
+        
+        self.update_board((row, col), val)
+        self.focused_cell.set_value(val)
+        return True
+        
+
+
+
+
+
 class Cell:
     def __init__(self, row, col, width, height, value):
         self.row = row
@@ -97,6 +115,8 @@ class Cell:
 
     def set_temp_value(self, val):
         self.temp_value = val
+    def set_value(self, val):
+        self.value = val
 
     # draws cell based on width/height and position in board array
     def draw(self):
@@ -157,6 +177,15 @@ def main():
                     key = 8
                 if event.key == pygame.K_9:
                     key = 9
+
+                if event.key == pygame.K_RETURN:
+                    if grid.focused_cell:
+                        if grid.place_num():
+                            pass
+                        else:
+                            key == None
+                        
+
 
                
 
