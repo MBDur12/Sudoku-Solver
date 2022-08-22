@@ -163,9 +163,12 @@ class Cell:
 
 
 
-def redraw_window(win, grid):
+def draw_window(win, grid):
     win.fill(WHITE)
     grid.draw_grid()
+
+    pygame.display.update()
+
 
 def main():
     grid = Grid(9, 9, WIDTH, HEIGHT, board)
@@ -225,8 +228,7 @@ def main():
         
             
 
-        redraw_window(win, grid)
-        pygame.display.update()
+        draw_window(win, grid)
         
 
 
