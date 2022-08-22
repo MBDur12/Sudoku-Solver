@@ -169,13 +169,15 @@ def get_formatted_time(time):
 
 
 
-def draw_window(win, grid, time):
+def draw_window(win, grid, time, strikes):
     font = pygame.font.SysFont("arial", 30)
     timer_text = font.render("Time: "+ get_formatted_time(time), True, BLACK)
+    strikes_text = font.render("X" * strikes, True, RED)
 
     win.fill(WHITE)
     grid.draw_grid()
     win.blit(timer_text, (10, HEIGHT - 50))
+    win.blit(strikes_text, (WIDTH // 2, HEIGHT - 50))
 
     pygame.display.update()
 
@@ -184,6 +186,7 @@ def main():
     grid = Grid(9, 9, WIDTH, HEIGHT, board)
     pygame.time.set_timer(INCREMENT_TIMER, 1000)
     time = 0
+    strikes = 0
     run = True
     while run:
         for event in pygame.event.get():
@@ -220,6 +223,7 @@ def main():
                         if grid.place_num():
                             print("success")
                         else:
+                            strikes += 1
                             key == None
 
                 if event.key == pygame.K_CLEAR or event.key == pygame.K_DELETE:
@@ -243,7 +247,7 @@ def main():
         
             
 
-        draw_window(win, grid, time)
+        draw_window(win, grid, time, strikes)
         
 
 
