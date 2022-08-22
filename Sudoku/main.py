@@ -1,7 +1,7 @@
 import pygame
 from backtracking import is_valid
 
-pygame.init()
+pygame.font.init()
 
 
 # DEFINE CONSTANT PARAMETERS
@@ -11,11 +11,15 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREY = (128, 128, 128)
 
+GAMEOVER_FONT = pygame.font.SysFont("arial", 80)
+
+
 win = pygame.display.set_mode((WIDTH, HEIGHT))
 win.fill((WHITE))
 pygame.display.set_caption("Sudoku Solver")
 
 INCREMENT_TIMER = pygame.USEREVENT + 1
+GAME_LOST = pygame.USEREVENT + 2
 
 board = [
     [7, 8, 0, 4, 0, 0, 1, 2, 0],
@@ -167,7 +171,17 @@ def get_formatted_time(time):
     secs = time % 60
     return f"{mins:02d}:{secs:02d}"
 
+def display_loss(win):
+    game_over_text = GAMEOVER_FONT.render("Game Over", True, BLACK)
 
+    win.blit(game_over_text, 
+        (WIDTH//2 - game_over_text.get_width()//2, 
+        HEIGHT//2 - game_over_text.get_height()//2))
+    
+    pygame.display.update()
+    pygame.time.delay(500)
+    pygame.event.post(pygame.event.Event(GAME_LOST))
+    
 
 def draw_window(win, grid, time, strikes):
     font = pygame.font.SysFont("arial", 30)
@@ -191,7 +205,7 @@ def main():
     while run:
         for event in pygame.event.get():
             # exit on quit
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT or event.type == GAME_LOST:
                 run = False
                 pygame.quit()
 
@@ -225,6 +239,10 @@ def main():
                         else:
                             strikes += 1
                             key == None
+                        
+                        if strikes == 3:
+                            display_loss(win)
+                        
 
                 if event.key == pygame.K_CLEAR or event.key == pygame.K_DELETE:
                     grid.clear_focused_cell()
