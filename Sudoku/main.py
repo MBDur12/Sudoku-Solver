@@ -67,6 +67,9 @@ class Grid:
             return True
         return False
 
+    def handleBackspace(self):
+        pass
+
     def handleClick(self, mouse_pos):
         # translates mouse position to corresponding cell indices
         row, col = self.get_coords_from_mouse_position(mouse_pos)
@@ -83,6 +86,8 @@ class Cell:
     def __init__(self, row, col, width, height, value):
         self.row = row
         self.col = col
+        # only true if cell is initally filled on board creation - it should not be edited
+        self.deletable = False if value > 0 else True
         # values determined by the size of the board / 9 for each square
         self.width = width
         self.height = height
@@ -157,6 +162,9 @@ def main():
                 if event.key == pygame.K_9:
                     key = 9
             
+            if event.type == pygame.K_BACKSPACE:
+                if grid.focused_cell:
+                    grid.handleBackspace()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 position = pygame.mouse.get_pos()
                 if grid.is_valid_position(position):
