@@ -19,7 +19,7 @@ win.fill((WHITE))
 pygame.display.set_caption("Sudoku Solver")
 
 INCREMENT_TIMER = pygame.USEREVENT + 1
-GAME_LOST = pygame.USEREVENT + 2
+GAME_OVER = pygame.USEREVENT + 2
 
 board = [
     [7, 8, 0, 4, 0, 0, 1, 2, 0],
@@ -109,6 +109,13 @@ class Grid:
         self.update_board((row, col), val)
         self.focused_cell.set_value(val)
         return True
+    
+    def is_filled(self):
+        for i in range(self.rows):
+            for j in range(self.cols):
+                if self.board[i][j] == 0:
+                    return False
+        return True
         
 
 
@@ -171,8 +178,8 @@ def get_formatted_time(time):
     secs = time % 60
     return f"{mins:02d}:{secs:02d}"
 
-def display_loss(win):
-    game_over_text = GAMEOVER_FONT.render("Game Over", True, BLACK)
+def display_game_over(win, text):
+    game_over_text = GAMEOVER_FONT.render(text, True, BLACK)
 
     win.blit(game_over_text, 
         (WIDTH//2 - game_over_text.get_width()//2, 
@@ -180,8 +187,9 @@ def display_loss(win):
     
     pygame.display.update()
     pygame.time.delay(500)
-    pygame.event.post(pygame.event.Event(GAME_LOST))
-    
+    pygame.event.post(pygame.event.Event(GAME_OVER))
+
+  
 
 def draw_window(win, grid, time, strikes):
     font = pygame.font.SysFont("arial", 30)
@@ -205,7 +213,7 @@ def main():
     while run:
         for event in pygame.event.get():
             # exit on quit
-            if event.type == pygame.QUIT or event.type == GAME_LOST:
+            if event.type == pygame.QUIT or event.type == GAME_OVER:
                 run = False
                 pygame.quit()
 
@@ -241,7 +249,9 @@ def main():
                             key == None
                         
                         if strikes == 3:
-                            display_loss(win)
+                            display_game_over(win, "You Lost")
+                        elif grid.is_filled():
+                            display_game_over(win, "You Won")
                         
 
                 if event.key == pygame.K_CLEAR or event.key == pygame.K_DELETE:
