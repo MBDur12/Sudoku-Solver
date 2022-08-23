@@ -229,7 +229,6 @@ def main():
                 pygame.quit()
             
             if event.type == GAME_OVER:
-                display_game_over()
                 main()
 
             if event.type == INCREMENT_TIMER:
