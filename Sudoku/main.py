@@ -41,6 +41,7 @@ class Grid:
         self.width = width
         self.height = height - (height - width)
         self.board = board
+        self.can_user_click = True
 
         self.cells = [[Cell(i, j, self.width, self.height, self.board[i][j]) for j in range(cols)] for i in range(rows)]
         self.focused_cell = None
@@ -49,8 +50,9 @@ class Grid:
         self.board[pos[0]][pos[1]] = val
 
     def clear_focused_cell(self):
-        if self.focused_cell:
-            self.focused_cell.reset_values()
+        if self.focused_cell and self.focused_cell.editable:
+            self.focused_cell.set_temp_value(0)
+            self.focused_cell.set_value(0)
             self.update_board(
                 (self.focused_cell.row, self.focused_cell.col)
                 ,0
@@ -62,7 +64,7 @@ class Grid:
         row, col = int(position[1] / 60), int(position[0] / 60)
         return (row, col)
 
-    def draw_grid(self):
+    def draw_grid(self, win):
         interval = self.width / self.rows
 
         for i in range(self.rows+1):
@@ -78,7 +80,7 @@ class Grid:
             # draw in cell number (if non-zero)
             for i in range(self.rows):
                 for j in range(self.cols):
-                    self.cells[i][j].draw()
+                    self.cells[i][j].draw(win)
     # returns true if mouse position on click occurs within the grid
     def is_valid_position(self, mouse_pos):
         if mouse_pos[0] < self.width and mouse_pos[1] < self.height:
@@ -86,14 +88,15 @@ class Grid:
         return False
 
     def handleClick(self, mouse_pos):
-        # translates mouse position to corresponding cell indices
-        row, col = self.get_coords_from_mouse_position(mouse_pos)
-        # removes focus from currently focused cell
-        if self.focused_cell:
-            self.focused_cell.remove_focus()
+        if self.can_user_click:
+            # translates mouse position to corresponding cell indices
+            row, col = self.get_coords_from_mouse_position(mouse_pos)
+            # removes focus from currently focused cell
+            if self.focused_cell:
+                self.focused_cell.remove_focus()
 
-        self.focused_cell = self.cells[row][col]
-        self.focused_cell.set_focus()
+            self.focused_cell = self.cells[row][col]
+            self.focused_cell.set_focus()
 
     def draw_note(self, key_val):
         self.focused_cell.set_temp_value(key_val)
@@ -105,10 +108,12 @@ class Grid:
         val = self.focused_cell.temp_value
         self.update_board((row, col), val)
         if is_valid(self.board, (row,col), val) and solve_board(self.board):
+            print(self.board)
             self.focused_cell.set_value(val)         
             return True
 
         self.update_board((row, col), 0)
+        self.clear_focused_cell()
         return False
     
     def is_filled(self):
@@ -117,9 +122,20 @@ class Grid:
                 if self.cells[i][j].value == 0:
                     return False
         return True
+    
+    
+    def solve_grid(self):
+        solve_board(self.board)
+        for i in range(self.rows):
+            for j in range(self.cols):
+                if self.cells[i][j].value == 0:
+                    self.cells[i][j].set_value(self.board[i][j])
+                print(self.cells[i][j].value)
+        self.stop_clicks()
+
+    def stop_clicks(self):
+        self.can_user_click = False
         
-
-
 
 
 
@@ -140,18 +156,13 @@ class Cell:
     def set_focus(self):
         self.focused = True
 
-    def reset_values(self):
-        self.temp_value = 0
-        self.value = 0
-
-
     def set_temp_value(self, val):
         self.temp_value = val
     def set_value(self, val):
         self.value = val
 
     # draws cell based on width/height and position in board array
-    def draw(self):
+    def draw(self, win):
         # define position of number (with offset)
         interval = self.width / 9
         x_pos = (self.col * interval) + 20
@@ -171,7 +182,7 @@ class Cell:
         
         if self.focused:
             highlighted_sq = pygame.Rect(self.col*60, self.row*60, 60, 60)
-            pygame.draw.rect(win, RED, highlighted_sq, 2)
+            pygame.draw.rect(win, RED, highlighted_sq, 3)
 
         
 def get_formatted_time(time):
@@ -187,22 +198,21 @@ def display_game_over(win, text):
         HEIGHT//2 - game_over_text.get_height()//2))
     
     pygame.display.update()
-    pygame.time.delay(500)
+    pygame.time.delay(2000)
     pygame.event.post(pygame.event.Event(GAME_OVER))
 
   
-
-def draw_window(win, grid, time, strikes):
+    
+def redraw_window(win, grid, time, strikes):
     font = pygame.font.SysFont("arial", 30)
     timer_text = font.render("Time: "+ get_formatted_time(time), True, BLACK)
     strikes_text = font.render("X" * strikes, True, RED)
 
     win.fill(WHITE)
-    grid.draw_grid()
+    grid.draw_grid(win)
     win.blit(timer_text, (10, HEIGHT - 50))
     win.blit(strikes_text, (WIDTH // 2, HEIGHT - 50))
 
-    pygame.display.update()
 
 
 def main():
@@ -214,9 +224,13 @@ def main():
     while run:
         for event in pygame.event.get():
             # exit on quit
-            if event.type == pygame.QUIT or event.type == GAME_OVER:
+            if event.type == pygame.QUIT:
                 run = False
                 pygame.quit()
+            
+            if event.type == GAME_OVER:
+                display_game_over()
+                main()
 
             if event.type == INCREMENT_TIMER:
                 time += 1
@@ -247,7 +261,7 @@ def main():
                             print("success")
                         else:
                             strikes += 1
-                            key == None
+                        key == None
                         
                         if strikes == 3:
                             display_game_over(win, "You Lost")
@@ -259,12 +273,9 @@ def main():
                     grid.clear_focused_cell()
 
                 if event.key == pygame.K_SPACE:
-                    print(solve_board(grid.board))
-                               
-
+                    grid.solve_grid()
 
                
-
             if event.type == pygame.MOUSEBUTTONDOWN:
                 position = pygame.mouse.get_pos()
                 if grid.is_valid_position(position):
@@ -279,7 +290,8 @@ def main():
         
             
 
-        draw_window(win, grid, time, strikes)
+        redraw_window(win, grid, time, strikes)
+        pygame.display.update()
         
 
 
